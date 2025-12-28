@@ -22,8 +22,6 @@ const MIME_TYPES: Record<string, string> = {
 
 export function startServer(options: ServerOptions) {
   const __dirname = dirname(fileURLToPath(import.meta.url));
-
-  // 👉 apps/cli/dist -> ../../web/dist
   const webRoot = join(__dirname, "../../web/dist");
 
   const server = createServer((req, res) => {
@@ -33,9 +31,22 @@ export function startServer(options: ServerOptions) {
       return;
     }
 
-    // normalize & prevent path traversal
-    const safePath = normalize(req.url).replace(/^(\.\.[\/\\])+/, "");
-    const pathname = safePath === "/" ? "/index.html" : safePath;
+    // 1️⃣ Strip query string
+    const rawPath = req.url.split("?")[0];
+
+    // 2️⃣ Normalize & prevent traversal
+    let pathname = normalize(rawPath).replace(/^(\.\.[\/\\])+/, "");
+
+    // 3️⃣ Directory → index.html
+    if (pathname.endsWith("/")) {
+      pathname += "index.html";
+    }
+
+    // 4️⃣ No extension → assume directory
+    if (!extname(pathname)) {
+      pathname = join(pathname, "index.html");
+    }
+
     const filePath = join(webRoot, pathname);
 
     if (!existsSync(filePath)) {
@@ -44,7 +55,6 @@ export function startServer(options: ServerOptions) {
       return;
     }
 
-    // directory access not allowed
     if (statSync(filePath).isDirectory()) {
       res.writeHead(403);
       res.end("Forbidden");

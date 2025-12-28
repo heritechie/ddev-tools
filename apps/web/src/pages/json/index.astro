@@ -1,0 +1,44 @@
+---
+import { formatJson } from '../../../../../packages/core/json/format';
+
+let result: { ok: true; formatted: string } | { ok: false; error: string } | null = null;
+
+if (Astro.request.method === 'POST') {
+  const formData = await Astro.request.formData();
+  const input = formData.get('input')?.toString() ?? '';
+  result = formatJson(input);
+}
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>JSON Formatter – ddev-tools</title>
+    <style>
+      textarea { width: 100%; min-height: 200px; }
+      pre { background: #111; color: #0f0; padding: 12px; }
+      .error { color: red; }
+    </style>
+  </head>
+  <body>
+    <h1>JSON Formatter</h1>
+
+    <form method="post">
+        <textarea
+        name="input"
+        placeholder='{ "hello": "world", "count": 1 }'
+      ></textarea>
+      
+      <br />
+      <button>Format</button>
+    </form>
+
+    {result && (
+      result.ok ? (
+        <pre>{result.formatted}</pre>
+      ) : (
+        <p class="error">Error: {result.error}</p>
+      )
+    )}
+  </body>
+</html>
