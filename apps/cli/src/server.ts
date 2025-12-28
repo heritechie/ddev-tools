@@ -41,7 +41,9 @@ export function startServer(options: ServerOptions) {
     const rawPath = req.url.split("?")[0];
 
     // 2️⃣ Normalize & prevent traversal
-    let pathname = normalize(rawPath).replace(/^(\.\.[\/\\])+/, "");
+    let pathname = normalize(rawPath)
+      .replace(/^(\.\.[\/\\])+/, "")
+      .replace(/^\/+/, "");
 
     // 3️⃣ Directory → index.html
     if (pathname.endsWith("/")) {
