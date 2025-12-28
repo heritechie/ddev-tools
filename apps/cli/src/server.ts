@@ -2,6 +2,7 @@ import { createServer } from "node:http";
 
 export type ServerOptions = {
   port: number;
+  onListening?: (url: string) => void;
 };
 
 export function startServer(options: ServerOptions) {
@@ -29,7 +30,9 @@ export function startServer(options: ServerOptions) {
   });
 
   server.listen(options.port, () => {
-    console.log(`Server running at http://localhost:${options.port}`);
+    const url = `http://localhost:${options.port}`;
+    console.log(`Server running at ${url}`);
+    options.onListening?.(url);
   });
 
   return server;

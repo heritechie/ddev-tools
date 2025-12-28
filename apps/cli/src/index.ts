@@ -4,6 +4,7 @@ import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { startServer } from "./server.js";
+import { openBrowser } from "./openBrowser.js";
 
 function getVersion(): string {
   const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -47,7 +48,14 @@ function main() {
     return;
   }
 
-  startServer({ port: options.port });
+  startServer({
+    port: options.port,
+    onListening: (url) => {
+      if (options.open) {
+        openBrowser(url);
+      }
+    },
+  });
 }
 
 main();
