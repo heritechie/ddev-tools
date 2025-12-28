@@ -3,6 +3,60 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Base64 Encode / Decode">
+  <style>
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      background: var(--bg-input);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    button {
+      background: var(--bg-hover);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: var(--bg-active);
+    }
+
+    button + button {
+      margin-left: 8px;
+    }
+
+    pre {
+      margin-top: 16px;
+      background: #111;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      white-space: pre-wrap;
+      font-family: ui-monospace, monospace;
+      font-size: 14px;
+    }
+
+    .error {
+      margin-top: 12px;
+      color: #ff6b6b;
+    }
+
+  </style>
+
   <h1>Base64 Encode / Decode</h1>
 
   <textarea 

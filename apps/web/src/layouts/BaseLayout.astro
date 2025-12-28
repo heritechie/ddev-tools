@@ -16,62 +16,79 @@ function isActive(href: string) {
     <title>{title}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
+      :root {
+        --bg-main: #0f0f0f;
+        --bg-panel: #151515;
+        --bg-input: #1e1e1e;
+        --bg-hover: #222;
+        --bg-active: #2a2a2a;
+
+        --text-main: #eaeaea;
+        --text-muted: #9a9a9a;
+        --accent: #4f8cff;
+        --border: #2a2a2a;
+      }
+
       body {
         margin: 0;
-        font-family: system-ui, sans-serif;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
         display: flex;
         min-height: 100vh;
-        background: #0f0f0f;
-        color: #eaeaea;
+        background: var(--bg-main);
+        color: var(--text-main);
       }
 
       aside {
         width: 220px;
-        background: #151515;
-        padding: 16px;
+        background: var(--bg-panel);
+        padding: 20px 16px;
         box-sizing: border-box;
+        border-right: 1px solid var(--border);
       }
 
       main {
         flex: 1;
-        padding: 24px;
+        padding: 32px;
       }
 
       h1 {
         margin-top: 0;
+        margin-bottom: 16px;
       }
 
       nav a {
         display: block;
         padding: 8px 10px;
         margin-bottom: 4px;
-        color: #ccc;
+        color: var(--text-muted);
         text-decoration: none;
-        border-radius: 4px;
+        border-radius: 6px;
       }
 
       nav a:hover {
-        background: #222;
-        color: #fff;
+        background: var(--bg-hover);
+        color: var(--text-main);
       }
 
       nav a.active {
-        background: #333;
-        color: #fff;
+        background: var(--bg-active);
+        color: var(--text-main);
         font-weight: 600;
       }
 
       footer {
-        margin-top: 40px;
+        margin-top: 48px;
         font-size: 12px;
-        color: #777;
+        color: var(--text-muted);
       }
     </style>
   </head>
 
   <body>
     <aside>
-      <h2>ddev-tools</h2>
+      <h2>
+        <a href="/">ddev-tools</a>
+      </h2>
       <nav>
         <a href="/json" class={isActive('/json') ? 'active' : ''}>JSON Formatter</a>
         <a href="/base64" class={isActive('/base64') ? 'active' : ''}>Base64</a>
