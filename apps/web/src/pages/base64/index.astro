@@ -1,24 +1,4 @@
 ---
-let output: string | null = null;
-let error: string | null = null;
-
-if (Astro.request.method === 'POST') {
-  const formData = await Astro.request.formData();
-  const input = formData.get('input')?.toString() ?? '';
-  const action = formData.get('action')?.toString();
-
-  try {
-    if (action === 'encode') {
-      output = Buffer.from(input, 'utf-8').toString('base64');
-    } else if (action === 'decode') {
-      output = Buffer.from(input, 'base64').toString('utf-8');
-    } else {
-      error = 'Unknown action';
-    }
-  } catch (e) {
-    error = (e as Error).message;
-  }
-}
 ---
 
 <html lang="en">
@@ -26,29 +6,68 @@ if (Astro.request.method === 'POST') {
     <meta charset="utf-8" />
     <title>Base64 – ddev-tools</title>
     <style>
-      textarea { width: 100%; min-height: 160px; }
-      pre { background: #111; color: #0f0; padding: 12px; white-space: pre-wrap; }
-      .error { color: red; }
-      .actions { margin-top: 8px; }
-      button { margin-right: 8px; }
+      textarea {
+        width: 100%;
+        min-height: 160px;
+        font-family: monospace;
+      }
+      pre {
+        background: #111;
+        color: #0f0;
+        padding: 12px;
+        white-space: pre-wrap;
+      }
+      .error {
+        color: red;
+        margin-top: 8px;
+      }
+      button {
+        margin-right: 8px;
+        margin-top: 8px;
+      }
     </style>
   </head>
   <body>
     <h1>Base64 Encode / Decode</h1>
 
-    <form method="post">
-      <textarea
-        name="input"
-        placeholder="Paste text or base64 here"
-      ></textarea>
+    <textarea id="input" placeholder="Paste text or base64 here"></textarea>
 
-      <div class="actions">
-        <button name="action" value="encode">Encode</button>
-        <button name="action" value="decode">Decode</button>
-      </div>
-    </form>
+    <br />
+    <button id="encode">Encode</button>
+    <button id="decode">Decode</button>
 
-    {error && <p class="error">Error: {error}</p>}
-    {output && <pre>{output}</pre>}
+    <div id="result"></div>
+
+    <script type="module">
+      import { encodeBase64, decodeBase64 } from '/_core/base64.js';
+
+      const input = document.getElementById('input');
+      const result = document.getElementById('result');
+
+      document.getElementById('encode').onclick = () => {
+        result.innerHTML = '';
+        try {
+          const out = encodeBase64(input.value);
+          const pre = document.createElement('pre');
+          pre.textContent = out;
+          result.appendChild(pre);
+        } catch (e) {
+          result.innerHTML = '<p class="error">' + e.message + '</p>';
+        }
+      };
+
+      document.getElementById('decode').onclick = () => {
+        result.innerHTML = '';
+        try {
+          const out = decodeBase64(input.value);
+          const pre = document.createElement('pre');
+          pre.textContent = out;
+          result.appendChild(pre);
+        } catch (e) {
+          result.innerHTML = '<p class="error">' + e.message + '</p>';
+        }
+      };
+    </script>
   </body>
 </html>
+

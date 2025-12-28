@@ -1,13 +1,4 @@
 ---
-import { formatJson } from '../../../../../packages/core/json/format';
-
-let result: { ok: true; formatted: string } | { ok: false; error: string } | null = null;
-
-if (Astro.request.method === 'POST') {
-  const formData = await Astro.request.formData();
-  const input = formData.get('input')?.toString() ?? '';
-  result = formatJson(input);
-}
 ---
 
 <html lang="en">
@@ -15,30 +6,67 @@ if (Astro.request.method === 'POST') {
     <meta charset="utf-8" />
     <title>JSON Formatter – ddev-tools</title>
     <style>
-      textarea { width: 100%; min-height: 200px; }
-      pre { background: #111; color: #0f0; padding: 12px; }
-      .error { color: red; }
+      textarea {
+        width: 100%;
+        min-height: 200px;
+        font-family: monospace;
+      }
+      pre {
+        background: #111;
+        color: #0f0;
+        padding: 12px;
+        white-space: pre-wrap;
+      }
+      .error {
+        color: red;
+        margin-top: 8px;
+      }
+      button {
+        margin-top: 8px;
+      }
     </style>
   </head>
   <body>
     <h1>JSON Formatter</h1>
 
-    <form method="post">
-        <textarea
-        name="input"
-        placeholder='{ "hello": "world", "count": 1 }'
-      ></textarea>
-      
-      <br />
-      <button>Format</button>
-    </form>
+    <textarea
+      id="input"
+      placeholder='{ "hello": "world", "count": 1 }'
+    ></textarea>
 
-    {result && (
-      result.ok ? (
-        <pre>{result.formatted}</pre>
-      ) : (
-        <p class="error">Error: {result.error}</p>
-      )
-    )}
+    <br />
+    <button id="format">Format</button>
+
+    <div id="result"></div>
+
+    <!-- 👇 Client-side logic -->
+    <script type="module">
+      import { formatJson } from '/_core/format.js';
+
+      const input = document.getElementById('input');
+      const result = document.getElementById('result');
+      const button = document.getElementById('format');
+
+      button.addEventListener('click', () => {
+        result.innerHTML = '';
+
+        const value = input.value.trim();
+        if (!value) return;
+
+        const out = formatJson(value);
+
+        if (!out.ok) {
+          const p = document.createElement('p');
+          p.className = 'error';
+          p.textContent = 'Error: ' + out.error;
+          result.appendChild(p);
+          return;
+        }
+
+        const pre = document.createElement('pre');
+        pre.textContent = out.formatted;
+        result.appendChild(pre);
+      });
+    </script>
   </body>
 </html>
