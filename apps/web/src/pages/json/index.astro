@@ -1,72 +1,46 @@
 ---
+import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
+<BaseLayout title="JSON Formatter">
+  <h1>JSON Formatter</h1>
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>JSON Formatter – ddev-tools</title>
-    <style>
-      textarea {
-        width: 100%;
-        min-height: 200px;
-        font-family: monospace;
+  <textarea
+    id="input"
+    placeholder='{ "hello": "world", "count": 1 }'
+  ></textarea>
+
+  <br />
+  <button id="format">Format</button>
+
+  <div id="result"></div>
+
+  <!-- 👇 Client-side logic -->
+  <script type="module">
+    import { formatJson } from '/_core/format.js';
+
+    const input = document.getElementById('input');
+    const result = document.getElementById('result');
+    const button = document.getElementById('format');
+
+    button.addEventListener('click', () => {
+      result.innerHTML = '';
+
+      const value = input.value.trim();
+      if (!value) return;
+
+      const out = formatJson(value);
+
+      if (!out.ok) {
+        const p = document.createElement('p');
+        p.className = 'error';
+        p.textContent = 'Error: ' + out.error;
+        result.appendChild(p);
+        return;
       }
-      pre {
-        background: #111;
-        color: #0f0;
-        padding: 12px;
-        white-space: pre-wrap;
-      }
-      .error {
-        color: red;
-        margin-top: 8px;
-      }
-      button {
-        margin-top: 8px;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>JSON Formatter</h1>
 
-    <textarea
-      id="input"
-      placeholder='{ "hello": "world", "count": 1 }'
-    ></textarea>
-
-    <br />
-    <button id="format">Format</button>
-
-    <div id="result"></div>
-
-    <!-- 👇 Client-side logic -->
-    <script type="module">
-      import { formatJson } from '/_core/format.js';
-
-      const input = document.getElementById('input');
-      const result = document.getElementById('result');
-      const button = document.getElementById('format');
-
-      button.addEventListener('click', () => {
-        result.innerHTML = '';
-
-        const value = input.value.trim();
-        if (!value) return;
-
-        const out = formatJson(value);
-
-        if (!out.ok) {
-          const p = document.createElement('p');
-          p.className = 'error';
-          p.textContent = 'Error: ' + out.error;
-          result.appendChild(p);
-          return;
-        }
-
-        const pre = document.createElement('pre');
-        pre.textContent = out.formatted;
-        result.appendChild(pre);
-      });
-    </script>
-  </body>
-</html>
+      const pre = document.createElement('pre');
+      pre.textContent = out.formatted;
+      result.appendChild(pre);
+    });
+  </script>
+</BaseLayout>

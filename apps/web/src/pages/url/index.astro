@@ -1,76 +1,50 @@
 ---
+import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>URL Encode / Decode – ddev-tools</title>
-    <style>
-      textarea {
-        width: 100%;
-        min-height: 160px;
-        font-family: monospace;
+<BaseLayout title="URL Encode / Decode">
+  <h1>URL Encode / Decode</h1>
+
+  <textarea
+    name="input"
+    placeholder="Paste URL or text here"
+  ></textarea>
+
+  <br />
+  <button name="action" value="encode">Encode</button>
+  <button name="action" value="decode">Decode</button>
+
+  <div id="result"></div>
+
+  <script type="module">
+    import { encodeUrl, decodeUrl } from '/_core/url.js';
+
+    const input = document.getElementById('input');
+    const result = document.getElementById('result');
+
+    document.getElementById('encode').onclick = () => {
+      result.innerHTML = '';
+      try {
+        const out = encodeUrl(input.value);
+        const pre = document.createElement('pre');
+        pre.textContent = out;
+        result.appendChild(pre);
+      } catch (e) {
+        result.innerHTML = '<p class="error">' + e.message + '</p>';
       }
-      pre {
-        background: #111;
-        color: #0f0;
-        padding: 12px;
-        white-space: pre-wrap;
+    };
+
+    document.getElementById('decode').onclick = () => {
+      result.innerHTML = '';
+      try {
+        const out = decodeUrl(input.value);
+        const pre = document.createElement('pre');
+        pre.textContent = out;
+        result.appendChild(pre);
+      } catch (e) {
+        result.innerHTML = '<p class="error">' + e.message + '</p>';
       }
-      .error {
-        color: red;
-        margin-top: 8px;
-      }
-      button {
-        margin-right: 8px;
-        margin-top: 8px;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>URL Encode / Decode</h1>
+    };
+  </script>
+</BaseLayout>
 
-    <textarea
-      name="input"
-      placeholder="Paste URL or text here"
-    ></textarea>
-
-    <br />
-    <button name="action" value="encode">Encode</button>
-    <button name="action" value="decode">Decode</button>
-
-    <div id="result"></div>
-
-    <script type="module">
-      import { encodeUrl, decodeUrl } from '/_core/url.js';
-
-      const input = document.getElementById('input');
-      const result = document.getElementById('result');
-
-      document.getElementById('encode').onclick = () => {
-        result.innerHTML = '';
-        try {
-          const out = encodeUrl(input.value);
-          const pre = document.createElement('pre');
-          pre.textContent = out;
-          result.appendChild(pre);
-        } catch (e) {
-          result.innerHTML = '<p class="error">' + e.message + '</p>';
-        }
-      };
-
-      document.getElementById('decode').onclick = () => {
-        result.innerHTML = '';
-        try {
-          const out = decodeUrl(input.value);
-          const pre = document.createElement('pre');
-          pre.textContent = out;
-          result.appendChild(pre);
-        } catch (e) {
-          result.innerHTML = '<p class="error">' + e.message + '</p>';
-        }
-      };
-    </script>
-
-  </body>
-</html>
