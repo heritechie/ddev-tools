@@ -1,0 +1,8 @@
+{
+  "name": "ddev-tools",
+  "private": true,
+  "packageManager": "pnpm@9.1.2",
+  "devDependencies": {
+    "@types/node": "^25.0.3"
+  }
+}
