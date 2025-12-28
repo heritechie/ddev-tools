@@ -4,17 +4,31 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
 <BaseLayout title="URL Encode / Decode">
   <style>
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
     textarea {
       width: 100%;
-      min-height: 180px;
+      flex: 1;
       background: var(--bg-input);
       color: var(--text-main);
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 12px;
+      padding: 14px;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       font-size: 14px;
       line-height: 1.5;
+      resize: none;
     }
 
     textarea:focus {
@@ -22,36 +36,45 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       border-color: var(--accent);
     }
 
-    button {
-      background: var(--bg-hover);
-      color: var(--text-main);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 6px 12px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: var(--bg-active);
-    }
-
-    button + button {
-      margin-left: 8px;
-    }
-
     pre {
-      margin-top: 16px;
+      flex: 1;
       background: #111;
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 12px;
-      white-space: pre-wrap;
+      padding: 14px;
       font-family: ui-monospace, monospace;
       font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      overflow: auto;
+    }
+
+    textarea,
+    pre {
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    .tool-panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 380px;
+    }
+
+    .tool-actions {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 12px;
+      padding-top: 24px;
+    }
+
+    .tool-actions button {
+      width: 100%;
+      padding: 10px 12px;
     }
 
     .error {
-      margin-top: 12px;
       color: #ff6b6b;
     }
 
@@ -59,46 +82,69 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
   <h1>URL Encode / Decode</h1>
 
-  <textarea
-    name="input"
-    placeholder="Paste URL or text here"
-  ></textarea>
+  <div class="tool-grid">
+    <!-- INPUT PANEL -->
+    <div class="tool-panel">
+      <label for="input">Input</label>
+      <textarea
+        id="input"
+        placeholder="Paste URL or text here"
+      ></textarea>
+    </div>
 
-  <br />
-  <button name="action" value="encode">Encode</button>
-  <button name="action" value="decode">Decode</button>
-
-  <div id="result"></div>
+    <!-- ACTIONS -->
+    <div class="tool-actions">
+      <button id="encode" class="btn-action">Encode</button>
+      <button id="decode" class="btn-action">Decode</button>
+    </div>
+  
+    <!-- OUTPUT PANEL -->
+    <div class="tool-panel">
+      <label>Output</label>
+      <pre id="result"></pre>
+    </div>
+  </div>
 
   <script type="module">
     import { encodeUrl, decodeUrl } from '/_core/url.js';
-
+  
     const input = document.getElementById('input');
     const result = document.getElementById('result');
+    const btnEncode = document.getElementById('encode');
+    const btnDecode = document.getElementById('decode');
 
-    document.getElementById('encode').onclick = () => {
-      result.innerHTML = '';
-      try {
-        const out = encodeUrl(input.value);
-        const pre = document.createElement('pre');
-        pre.textContent = out;
-        result.appendChild(pre);
-      } catch (e) {
-        result.innerHTML = '<p class="error">' + e.message + '</p>';
-      }
-    };
+    function updateButtons() {
+      const hasValue = input.value.trim().length > 0;
+      btnEncode.disabled = !hasValue;
+      btnDecode.disabled = !hasValue;
+    }
 
-    document.getElementById('decode').onclick = () => {
-      result.innerHTML = '';
+    input.addEventListener('input', updateButtons);
+    updateButtons();
+  
+    function clearResult() {
+      result.textContent = '';
+      result.classList.remove('error');
+    }
+  
+    function run(action) {
+      clearResult();
+  
+      const value = input.value.trim();
+      if (!value) return;
+  
       try {
-        const out = decodeUrl(input.value);
-        const pre = document.createElement('pre');
-        pre.textContent = out;
-        result.appendChild(pre);
-      } catch (e) {
-        result.innerHTML = '<p class="error">' + e.message + '</p>';
+        const out = action(value);
+        result.textContent = out;
+      } catch (err) {
+        result.textContent =
+          err instanceof Error ? err.message : 'Invalid input';
+        result.classList.add('error');
       }
-    };
+    }
+  
+    btnEncode.onclick = () => run(encodeUrl);
+    btnDecode.onclick = () => run(decodeUrl);
   </script>
 </BaseLayout>
 

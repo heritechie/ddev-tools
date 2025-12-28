@@ -4,17 +4,31 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
 <BaseLayout title="Base64 Encode / Decode">
   <style>
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
     textarea {
       width: 100%;
-      min-height: 180px;
+      flex: 1;
       background: var(--bg-input);
       color: var(--text-main);
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 12px;
+      padding: 14px;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       font-size: 14px;
       line-height: 1.5;
+      resize: none;
     }
 
     textarea:focus {
@@ -22,83 +36,112 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       border-color: var(--accent);
     }
 
-    button {
-      background: var(--bg-hover);
-      color: var(--text-main);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 6px 12px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: var(--bg-active);
-    }
-
-    button + button {
-      margin-left: 8px;
-    }
-
     pre {
-      margin-top: 16px;
+      flex: 1;
       background: #111;
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 12px;
-      white-space: pre-wrap;
+      padding: 14px;
       font-family: ui-monospace, monospace;
       font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      overflow: auto;
+    }
+
+    textarea,
+    pre {
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    .tool-panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 380px;
+    }
+
+    .tool-actions {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 12px;
+      padding-top: 24px;
+    }
+
+    .tool-actions button {
+      width: 100%;
     }
 
     .error {
-      margin-top: 12px;
       color: #ff6b6b;
     }
-
   </style>
 
   <h1>Base64 Encode / Decode</h1>
 
-  <textarea 
-    id="input" 
-    placeholder="Paste text or base64 here">
-  </textarea>
+  <div class="tool-grid">
+    <!-- INPUT -->
+    <div class="tool-panel">
+      <label for="input">Input</label>
+      <textarea
+        id="input"
+        placeholder="Paste text or base64 here"
+      ></textarea>
+    </div>
 
-  <br />
-  <button id="encode">Encode</button>
-  <button id="decode">Decode</button>
+    <!-- ACTIONS -->
+    <div class="tool-actions">
+      <button id="encode" class="btn-action">Encode</button>
+      <button id="decode" class="btn-action">Decode</button>
+    </div>
 
-  <div id="result"></div>
+    <!-- OUTPUT -->
+    <div class="tool-panel">
+      <label>Output</label>
+      <pre id="result"></pre>
+    </div>
+  </div>
 
   <script type="module">
     import { encodeBase64, decodeBase64 } from '/_core/base64.js';
 
     const input = document.getElementById('input');
     const result = document.getElementById('result');
+    const btnEncode = document.getElementById('encode');
+    const btnDecode = document.getElementById('decode');
 
-    document.getElementById('encode').onclick = () => {
-      result.innerHTML = '';
-      try {
-        const out = encodeBase64(input.value);
-        const pre = document.createElement('pre');
-        pre.textContent = out;
-        result.appendChild(pre);
-      } catch (e) {
-        result.innerHTML = '<p class="error">' + e.message + '</p>';
-      }
-    };
+    function updateButtons() {
+      const hasValue = input.value.trim().length > 0;
+      btnEncode.disabled = !hasValue;
+      btnDecode.disabled = !hasValue;
+    }
 
-    document.getElementById('decode').onclick = () => {
-      result.innerHTML = '';
+    input.addEventListener('input', updateButtons);
+    updateButtons();
+
+    function clearResult() {
+      result.textContent = '';
+      result.classList.remove('error');
+    }
+
+    function run(action) {
+      clearResult();
+
+      const value = input.value.trim();
+      if (!value) return;
+
       try {
-        const out = decodeBase64(input.value);
-        const pre = document.createElement('pre');
-        pre.textContent = out;
-        result.appendChild(pre);
-      } catch (e) {
-        result.innerHTML = '<p class="error">' + e.message + '</p>';
+        const out = action(value);
+        result.textContent = out;
+      } catch (err) {
+        result.textContent =
+          err instanceof Error ? err.message : 'Invalid input';
+        result.classList.add('error');
       }
-    };
+    }
+
+    btnEncode.onclick = () => run(encodeBase64);
+    btnDecode.onclick = () => run(decodeBase64);
   </script>
 </BaseLayout>
-

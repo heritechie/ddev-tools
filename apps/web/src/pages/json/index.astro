@@ -1,10 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
+
 <BaseLayout title="JSON Formatter">
   <style>
-    /* ===== Page-scoped styling (content only) ===== */
-
     h1 {
       margin-bottom: 20px;
     }
@@ -17,7 +16,6 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       color: var(--text-muted);
       margin-bottom: 8px;
     }
-
 
     textarea {
       width: 100%;
@@ -57,20 +55,6 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       box-sizing: border-box;
     }
 
-    button {
-      background: var(--bg-hover);
-      color: var(--text-main);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 8px 12px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    button:hover {
-      background: var(--bg-active);
-    }
-
     .tool-panel {
       display: flex;
       flex-direction: column;
@@ -87,20 +71,17 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
     .tool-actions button {
       width: 100%;
-      padding: 10px 12px;
     }
 
     .error {
       color: #ff6b6b;
     }
-
   </style>
 
   <h1>JSON Formatter</h1>
 
-  <!-- ===== TOOL GRID ===== -->
   <div class="tool-grid">
-    <!-- INPUT PANEL -->
+    <!-- INPUT -->
     <div class="tool-panel">
       <label for="input">Input</label>
       <textarea
@@ -111,40 +92,79 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
     <!-- ACTIONS -->
     <div class="tool-actions">
-      <button id="format">Format →</button>
+      <button id="beautify" class="btn-action">
+        <span>Beautify</span>
+      </button>
+      <button id="compact" class="btn-action">
+        <span>Compact</span>
+      </button>
     </div>
-  
-    <!-- OUTPUT PANEL -->
+
+    <!-- OUTPUT -->
     <div class="tool-panel">
       <label>Output</label>
       <pre id="result"></pre>
     </div>
   </div>
 
-  <!-- 👇 Client-side logic -->
   <script type="module">
     import { formatJson } from '/_core/format.js';
 
     const input = document.getElementById('input');
     const result = document.getElementById('result');
-    const btn = document.getElementById('format');
+    const btnBeautify = document.getElementById('beautify');
+    const btnCompact = document.getElementById('compact');
 
-    btn.onclick = () => {
+    function clearResult() {
       result.textContent = '';
       result.classList.remove('error');
+    }
+
+    function hasInput() {
+      return input.value.trim().length > 0;
+    }
+
+    function updateButtons() {
+      const enabled = hasInput();
+      btnBeautify.disabled = !enabled;
+      btnCompact.disabled = !enabled;
+    }
+
+    function run(mode) {
+      clearResult();
 
       const value = input.value.trim();
       if (!value) return;
 
-      const out = formatJson(value);
+      try {
+        if (mode === 'beautify') {
+          const out = formatJson(value);
+          if (!out.ok) throw new Error(out.error);
+          result.textContent = out.formatted;
+        }
 
-      if (!out.ok) {
-        result.textContent = out.error;
+        if (mode === 'compact') {
+          const parsed = JSON.parse(value);
+          result.textContent = JSON.stringify(parsed);
+        }
+      } catch (err) {
+        result.textContent =
+          err instanceof Error ? err.message : 'Invalid JSON';
         result.classList.add('error');
-        return;
       }
+    }
 
-      result.textContent = out.formatted;
-    };
+    input.addEventListener('input', updateButtons);
+    updateButtons();
+
+    btnBeautify.onclick = () => run('beautify');
+    btnCompact.onclick = () => run('compact');
+
+    // Ctrl / Cmd + Enter → Beautify
+    input.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        run('beautify');
+      }
+    });
   </script>
 </BaseLayout>
