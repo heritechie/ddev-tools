@@ -1,0 +1,18 @@
+{
+  "name": "ddev-tools",
+  "version": "0.0.0",
+  "private": false,
+  "description": "CLI runner for ddev-tools",
+  "bin": {
+    "ddt": "dist/index.js"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}
