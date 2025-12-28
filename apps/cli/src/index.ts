@@ -3,6 +3,7 @@ import { parseArgs } from "./args.js";
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import { startServer } from "./server.js";
 
 function getVersion(): string {
   const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -46,8 +47,7 @@ function main() {
     return;
   }
 
-  console.log("ddt options:", options);
-  console.log("Status: CLI argument parsing OK");
+  startServer({ port: options.port });
 }
 
 main();
