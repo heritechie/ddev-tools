@@ -3,17 +3,34 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 <BaseLayout title="JSON Formatter">
   <style>
+    /* ===== Page-scoped styling (content only) ===== */
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+
     textarea {
       width: 100%;
-      min-height: 180px;
+      flex: 1;
       background: var(--bg-input);
       color: var(--text-main);
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 12px;
+      padding: 14px;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       font-size: 14px;
       line-height: 1.5;
+      resize: none;
     }
 
     textarea:focus {
@@ -21,36 +38,59 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       border-color: var(--accent);
     }
 
+    pre {
+      flex: 1;
+      background: #111;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px;
+      font-family: ui-monospace, monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      overflow: auto;
+    }
+
+    textarea,
+    pre {
+      margin: 0;
+      box-sizing: border-box;
+    }
+
     button {
       background: var(--bg-hover);
       color: var(--text-main);
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 6px 12px;
+      padding: 8px 12px;
       cursor: pointer;
+      font-size: 14px;
     }
 
     button:hover {
       background: var(--bg-active);
     }
 
-    button + button {
-      margin-left: 8px;
+    .tool-panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 380px;
     }
 
-    pre {
-      margin-top: 16px;
-      background: #111;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 12px;
-      white-space: pre-wrap;
-      font-family: ui-monospace, monospace;
-      font-size: 14px;
+    .tool-actions {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 12px;
+      padding-top: 24px;
+    }
+
+    .tool-actions button {
+      width: 100%;
+      padding: 10px 12px;
     }
 
     .error {
-      margin-top: 12px;
       color: #ff6b6b;
     }
 
@@ -58,15 +98,28 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
   <h1>JSON Formatter</h1>
 
-  <textarea
-    id="input"
-    placeholder='{ "hello": "world", "count": 1 }'
-  ></textarea>
+  <!-- ===== TOOL GRID ===== -->
+  <div class="tool-grid">
+    <!-- INPUT PANEL -->
+    <div class="tool-panel">
+      <label for="input">Input</label>
+      <textarea
+        id="input"
+        placeholder='{ "hello": "world" }'
+      ></textarea>
+    </div>
 
-  <br />
-  <button id="format">Format</button>
-
-  <div id="result"></div>
+    <!-- ACTIONS -->
+    <div class="tool-actions">
+      <button id="format">Format →</button>
+    </div>
+  
+    <!-- OUTPUT PANEL -->
+    <div class="tool-panel">
+      <label>Output</label>
+      <pre id="result"></pre>
+    </div>
+  </div>
 
   <!-- 👇 Client-side logic -->
   <script type="module">
@@ -74,10 +127,11 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
     const input = document.getElementById('input');
     const result = document.getElementById('result');
-    const button = document.getElementById('format');
+    const btn = document.getElementById('format');
 
-    button.addEventListener('click', () => {
-      result.innerHTML = '';
+    btn.onclick = () => {
+      result.textContent = '';
+      result.classList.remove('error');
 
       const value = input.value.trim();
       if (!value) return;
@@ -85,16 +139,12 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       const out = formatJson(value);
 
       if (!out.ok) {
-        const p = document.createElement('p');
-        p.className = 'error';
-        p.textContent = 'Error: ' + out.error;
-        result.appendChild(p);
+        result.textContent = out.error;
+        result.classList.add('error');
         return;
       }
 
-      const pre = document.createElement('pre');
-      pre.textContent = out.formatted;
-      result.appendChild(pre);
-    });
+      result.textContent = out.formatted;
+    };
   </script>
 </BaseLayout>

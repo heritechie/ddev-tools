@@ -59,6 +59,8 @@ function isActive(href: string) {
       main {
         flex: 1;
         padding: 32px;
+        display: flex;
+        flex-direction: column;
       }
 
       h1 {
@@ -87,10 +89,55 @@ function isActive(href: string) {
       }
 
       footer {
-        margin-top: 48px;
+        margin-top: auto;
+        padding-top: 32px;
         font-size: 12px;
         color: var(--text-muted);
       }
+
+      /* Content layout */
+      :global(.tool-grid) {
+        display: grid;
+        grid-template-columns: 1fr 160px 1fr;
+        gap: 24px;
+        align-items: stretch;
+      }
+
+      :global(.tool-panel) {
+        display: flex;
+        flex-direction: column;
+      }
+
+      :global(.tool-panel textarea),
+      :global(.tool-panel pre) {
+        flex: 1;
+        min-height: 360px;
+      }
+
+      :global(.tool-actions) {
+        padding-top: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
+
+      :global(.tool-actions button) {
+        pointer-events: auto;
+        width: auto;
+        min-width: 100px;
+        padding: 8px 14px;
+      }
+
+      :global(.tool-actions)::before {
+        content: '';
+        position: absolute;
+        width: 1px;
+        height: 60%;
+        background: var(--border);
+        opacity: 0.4;
+      }
+
     </style>
   </head>
 
