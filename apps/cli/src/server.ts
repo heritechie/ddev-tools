@@ -25,9 +25,15 @@ export function startServer(options: ServerOptions) {
   const webRoot = join(__dirname, "../../web/dist");
 
   const server = createServer((req, res) => {
-    if (!req.url || req.method !== "GET") {
+    if (!req.url) {
       res.writeHead(400);
       res.end();
+      return;
+    }
+
+    if (req.method !== "GET" && req.method !== "POST") {
+      res.writeHead(405);
+      res.end("Method Not Allowed");
       return;
     }
 
